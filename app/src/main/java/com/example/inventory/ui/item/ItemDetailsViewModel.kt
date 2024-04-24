@@ -31,29 +31,48 @@ import kotlinx.coroutines.launch
  * ViewModel to retrieve, update and delete an item from the [ItemsRepository]'s data source.
  */
 class ItemDetailsViewModel(
-    savedStateHandle: SavedStateHandle,
-    private val itemsRepository: ItemsRepository,
+    private val savedStateHandle: SavedStateHandle,
+    private val itemsRepository: ItemsRepository
 ) : ViewModel() {
 
-    private val itemId: Int = checkNotNull(savedStateHandle[ItemDetailsDestination.itemIdArg])
+    // Retrieve the item ID from the SavedStateHandle or set it to an empty string if not present
+    private val itemId: Int = savedStateHandle.get<Int>(ItemDetailsDestination.itemIdArg) ?: -1
+
+    // Property to hold the entered item ID
+    var enteredItemId: String
+        get() = savedStateHandle.get<String>("enteredItemId") ?: ""
+        set(value) {
+            savedStateHandle.set("enteredItemId", value)
+        }
 
     /**
-     * Holds the item details ui state. The data is retrieved from [ItemsRepository] and mapped to
+     * Holds the item details UI state. The data is retrieved from [ItemsRepository] and mapped to
      * the UI state.
      */
     val uiState: StateFlow<ItemDetailsUiState> =
         itemsRepository.getItemStream(itemId)
             .filterNotNull()
             .map {
-                ItemDetailsUiState(outOfStock = it.quantity <= 0, itemDetails = it.toItemDetails())
+                ItemDetailsUiState(
+                    outOfStock = it.quantity <= 0,
+                    itemDetails = it.toItemDetails(),
+                    itemId = enteredItemId // Include the entered item ID in the UI state
+                )
             }.stateIn(
                 scope = viewModelScope,
-                started = SharingStarted.WhileSubscribed(TIMEOUT_MILLIS),
+                started = SharingStarted.WhileSubscribed(ItemDetailsViewModel.TIMEOUT_MILLIS),
                 initialValue = ItemDetailsUiState()
             )
 
     /**
-     * Reduces the item quantity by one and update the [ItemsRepository]'s data source.
+     * Function to update the entered item ID from the UI
+     */
+    fun updateEnteredItemId(newItemId: String) {
+        enteredItemId = newItemId
+    }
+
+    /**
+     * Reduces the item quantity by one and updates the [ItemsRepository]'s data source.
      */
     fun reduceQuantityByOne() {
         viewModelScope.launch {
@@ -72,7 +91,7 @@ class ItemDetailsViewModel(
     }
 
     companion object {
-        private const val TIMEOUT_MILLIS = 5_000L
+        const val TIMEOUT_MILLIS = 5_000L
     }
 }
 
@@ -81,5 +100,6 @@ class ItemDetailsViewModel(
  */
 data class ItemDetailsUiState(
     val outOfStock: Boolean = true,
-    val itemDetails: ItemDetails = ItemDetails()
+    val itemDetails: ItemDetails = ItemDetails(),
+    val itemId: String = "" // Include the entered item ID in the UI state
 )
