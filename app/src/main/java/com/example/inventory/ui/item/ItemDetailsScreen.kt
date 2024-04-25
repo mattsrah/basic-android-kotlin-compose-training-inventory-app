@@ -41,7 +41,6 @@ import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -87,7 +86,22 @@ fun ItemDetailsScreen(
     val coroutineScope = rememberCoroutineScope()
 
     // Define a variable to hold the current item ID
-    var itemId by rememberSaveable { mutableStateOf("") }
+    var itemId by remember { mutableStateOf("") }
+
+    // State to track the quantity bought
+    var quantityBought by remember { mutableStateOf(0) }
+
+    // State to track the price
+    var price by remember { mutableStateOf(0.0) }
+
+    ItemEditScreen(
+        navigateBack = navigateBack,
+        onNavigateUp = navigateBack,
+        itemName = uiState.value.itemDetails.name,
+        quantityBought = quantityBought,
+        price = price,
+        modifier = Modifier
+    )
 
     Scaffold(
         topBar = {
@@ -114,7 +128,8 @@ fun ItemDetailsScreen(
             }
         },
         modifier = modifier,
-    ) { innerPadding ->
+    )
+    { innerPadding ->
         ItemDetailsBody(
             itemDetailsUiState = uiState.value,
             onSellItem = { viewModel.reduceQuantityByOne() },
@@ -138,6 +153,7 @@ fun ItemDetailsScreen(
                 .verticalScroll(rememberScrollState())
         )
     }
+
 }
 
 
@@ -158,21 +174,13 @@ private fun ItemDetailsBody(
             item = itemDetailsUiState.itemDetails.toItem(), modifier = Modifier.fillMaxWidth()
         )
 
-        // TextField for entering item ID
-        OutlinedTextField(
-            value = itemDetailsUiState.itemId,
-            onValueChange = onItemIdChange,
-            label = { Text(text = stringResource(R.string.item_id_label)) },
-            modifier = Modifier.fillMaxWidth()
-        )
-
         Button(
             onClick = onSellItem,
             modifier = Modifier.fillMaxWidth(),
             shape = MaterialTheme.shapes.small,
             enabled = !itemDetailsUiState.outOfStock
         ) {
-            Text(stringResource(R.string.sell))
+            Text(stringResource(R.string.buy))
         }
         OutlinedButton(
             onClick = { deleteConfirmationRequired = true },
@@ -193,8 +201,6 @@ private fun ItemDetailsBody(
         }
     }
 }
-
-
 
 @Composable
 fun ItemDetails(
@@ -242,6 +248,17 @@ fun ItemDetails(
                     )
                 )
             )
+
+            ItemDetailsRow(
+                labelResID = R.string.id,
+                itemDetail = item.id.toString(),
+                modifier = Modifier.padding(
+                    horizontal = dimensionResource(
+                        id = R.dimen
+                            .padding_medium
+                    )
+                )
+            )
         }
 
     }
@@ -282,8 +299,13 @@ private fun DeleteConfirmationDialog(
 @Composable
 fun ItemDetailsScreenPreview() {
     InventoryTheme {
-        ItemDetailsBody(ItemDetailsUiState(
-            outOfStock = true, itemDetails = ItemDetails(1, "Pen", "$100", "10")
-        ), onSellItem = {}, onDelete = {})
+        ItemDetailsBody(
+            itemDetailsUiState = ItemDetailsUiState(
+                outOfStock = true,
+            ),
+            onSellItem = {}, // Define the onSellItem lambda
+            onDelete = {}, // Define the onDelete lambda
+            onItemIdChange = {} // Define the onItemIdChange lambda
+        )
     }
 }

@@ -28,4 +28,8 @@ class OfflineItemsRepository(private val itemDao: ItemDao) : ItemsRepository {
     override suspend fun deleteItem(item: Item) = itemDao.delete(item)
 
     override suspend fun updateItem(item: Item) = itemDao.update(item)
+
+    override fun searchItems(query: String): Flow<List<Item>> {
+        return itemDao.searchItems(query)
+    }
 }

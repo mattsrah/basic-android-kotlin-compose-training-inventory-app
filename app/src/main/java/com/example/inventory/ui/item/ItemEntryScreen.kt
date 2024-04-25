@@ -98,6 +98,7 @@ fun ItemEntryScreen(
     }
 }
 
+
 @Composable
 fun ItemEntryBody(
     itemUiState: ItemUiState,
@@ -136,6 +137,20 @@ fun ItemInputForm(
         modifier = modifier,
         verticalArrangement = Arrangement.spacedBy(dimensionResource(id = R.dimen.padding_medium))
     ) {
+        OutlinedTextField(
+            value = itemDetails.id.toString(), // Convert item ID to String
+            onValueChange = { onValueChange(itemDetails.copy(id = it.toIntOrNull() ?: 0)) },
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number), // Adjust keyboard type if necessary
+            label = { Text(stringResource(R.string.item_id_label)) },
+            colors = OutlinedTextFieldDefaults.colors(
+                focusedContainerColor = MaterialTheme.colorScheme.secondaryContainer,
+                unfocusedContainerColor = MaterialTheme.colorScheme.secondaryContainer,
+                disabledContainerColor = MaterialTheme.colorScheme.secondaryContainer,
+            ),
+            modifier = Modifier.fillMaxWidth(),
+            enabled = enabled,
+            singleLine = true
+        )
         OutlinedTextField(
             value = itemDetails.name,
             onValueChange = { onValueChange(itemDetails.copy(name = it)) },
@@ -186,6 +201,7 @@ fun ItemInputForm(
         }
     }
 }
+
 
 @Preview(showBackground = true)
 @Composable

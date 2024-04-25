@@ -46,4 +46,7 @@ interface ItemsRepository {
      * Update item in the data source
      */
     suspend fun updateItem(item: Item)
+    // New method for searching items
+
+    fun searchItems(query: String): Flow<List<Item>>
 }

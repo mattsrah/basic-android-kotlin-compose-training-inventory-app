@@ -27,8 +27,10 @@
     <string name="item_name_req">Item Name*</string>
     <string name="item_price_req">Item Price*</string>
     <string name="item_id_label">Item ID:</string>
+    <string name="search_title"> Search</string>
     <string name="no">No</string>
     <string name="price">Price</string>
+    <string name="id">Id</string>
     <string name="quantity_in_stock">Quantity in stock</string>
     <string name="in_stock">%d in stock</string>
     <string name="quantity_req">Quantity in Stock*</string>
@@ -36,4 +38,7 @@
     <string name="sell">Sell</string>
     <string name="yes">Yes</string>
     <string name="required_fields">*required fields</string>
+    <string name="search_button">Search</string>
+    <string name="search_hint">Enter Item Name or Item ID</string>
+    <string name="buy">Buy</string>
 </resources>

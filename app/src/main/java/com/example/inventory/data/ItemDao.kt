@@ -36,6 +36,9 @@ interface ItemDao {
     @Query("SELECT * from items WHERE id = :id")
     fun getItem(id: Int): Flow<Item>
 
+    @Query("SELECT * FROM items WHERE name LIKE '%' || :query || '%' ORDER BY name ASC")
+    fun searchItems(query: String): Flow<List<Item>>
+
     // Specify the conflict strategy as IGNORE, when the user tries to add an
     // existing Item into the database Room ignores the conflict.
     @Insert(onConflict = OnConflictStrategy.IGNORE)
@@ -46,4 +49,5 @@ interface ItemDao {
 
     @Delete
     suspend fun delete(item: Item)
+
 }
